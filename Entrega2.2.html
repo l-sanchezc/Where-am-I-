@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<!--ENTREGA 2.2:
+Lázaro Sánchez Campos 02715459-X
+Diego San Cristóbal Bastardo 47410447-H -->
+<html>
+<head>
+<title>Entrega 2.2 - GEOLOCALIZACIÓN</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <style type="text/css">
+        html, body {
+        width: 100%;
+        height: 100%;
+    }
+    #map_canvas {
+        height: 85%;
+        width: 100%;
+    }
+    </style>
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"></script>
+<script type="text/javascript">
+// Determine support for Geolocation
+if (navigator.geolocation) {
+    // Locate position
+    navigator.geolocation.getCurrentPosition(displayPosition, errorFunction);
+} else {
+    alert('It seems like Geolocation, which is required for this page, is not enabled in your browser. Please use a browser which supports it.');
+}
+
+// Success callback function
+function displayPosition(pos) {
+    var mylat = pos.coords.latitude;
+    var mylong = pos.coords.longitude;
+    var thediv = document.getElementById('locationinfo');
+    thediv.innerHTML = '<p>Tus coordenadas actuales son : <p> Longitud : '+  mylong + ' Latidud :' + mylat + '<p>';
+    localStorage.latitud = pos.coords.latitude;
+    localStorage.longitud = pos.coords.longitude;
+
+//Load Google Map
+var latlng = new google.maps.LatLng(mylat, mylong);
+    var myOptions = {
+      zoom: 15,
+      center: latlng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+
+var latlng2 = new google.maps.LatLng(localStorage.latitudGuardada, localStorage.longitudGuardada);
+var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+//Add marker
+var marker1 = new google.maps.Marker({
+         position: latlng, 
+         map: map, 
+         title:"You are here"
+     });
+
+var marker2 = new google.maps.Marker({
+        position: latlng2,
+        map: map,
+        title:"You were here"
+      });
+var distance = google.maps.geometry.spherical.computeDistanceBetween(latlng, latlng2);
+distance = (distance || 0);
+var thedis = document.getElementById('distanciainfo');
+  thedis.innerHTML =  '<p>Tu distancia respecto a la última consulta es de : ' + Math.round(distance) +' metros</p>';
+
+}
+
+// Error callback function
+function errorFunction(pos) {
+    alert('Error!');
+}
+</script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"> </script>   
+<script type="text/javascript">      
+  $(function(){
+    $("#lat").val(localStorage.latitud);
+    $("#long").val(localStorage.longitud);      
+    $('#but').on('click', function(){ 
+      if(($('#lat').val() != "") || ($('#long').val() != "")){
+      localStorage.longitudGuardada = $('#long').val();
+      localStorage.latitudGuardada = $('#lat').val();
+      window.location.reload();
+      }else{
+          alert("Las coordenadas introducidas son inválidas");
+       }
+      });  
+    }); 
+</script>
+ <link id="size-stylesheet"
+      rel= "stylesheet"
+      type="text/css"
+      href="style.css"/>
+
+<script type="text/javascript">
+  function adjustStyle(width) {
+    width = parseInt(width);
+    if (width < 480) {
+        $("#size-stylesheet").attr("href", "smartphone.css");
+    } else if ((width >= 701) && (width < 900)) {
+        $("#size-stylesheet").attr("href", "tablet.css");
+    } else if(width >= 900) {
+       $("#size-stylesheet").attr("href", "wide.css"); 
+    }
+  }
+  $(function() {
+    adjustStyle($(this).width());
+    $(window).resize(function() {
+      adjustStyle($(this).width());
+    });
+  });
+</script>   
+</head>
+<body>
+  <div id="page-wrap">
+  <div id="cabecera">
+    <h1>¿Dónde estoy?</h1>
+    <br>
+    <br>
+  </div>
+    <h3>Breve descripción:</h3>
+    <p>
+    Mediante esta página puedes:<p>
+    <ul> 
+      <li>Ver tu posición actual.</li>
+      <li>Obtener la distancia desde tu posición hasta unas coordenas elegidas.</li>
+      <li>Modificar las coordenadas hasta donde quieres calcular la distancia desde tu ubicación.</li>
+    </ul>
+    <br>
+    <br>
+  <div id="video">
+    <h3>Vídeo explicativo:</h3>
+    <br>
+    <video src="capture.ogv"
+            width="500"
+            height="300"
+            controls
+            preload
+            autoplay>
+    </video>
+  </div>
+  </div>
+    <div id="mapa">
+    <br>
+    <br>
+    <h3>Mapa geolocalización:</h3>
+        <br>
+  </div>
+        <div id="map_canvas"></div>
+  <br>
+  <h3>Posición:</h3>
+        <div id="locationinfo"></div>
+        <div id="distanciainfo"></div>
+        <br>
+        <br>
+  <h3>Nueva posición:</h3>
+        <p>
+          <form>
+            Latitud: <input TYPE="text" id="lat" SIZE=20 > <p>
+            Longitud: <input TYPE="text" id="long" SIZE=20 > <p>
+          <input type='button' id='but' value='Editar'/>
+           <p>
+          </form>
+          <br>
+    <footer>Autores: Lázaro Sánchez Campos y Diego San Cristóbal Bastardo </footer>
+</body>
+</html>
